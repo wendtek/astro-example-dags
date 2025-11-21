@@ -39,7 +39,7 @@ def example_astronauts():
         # Define an asset outlet for the task. This can be used to schedule downstream DAGs when this task has run.
         outlets=[Asset("current_astronauts")]
     )  # Define that this task updates the `current_astronauts` Asset
-    def get_astronauts(**context) -> None:
+    def print_astronauts(**context) -> None:
         """
         This task uses the requests library to retrieve a list of Astronauts
         currently in space. The results are pushed to XCom with a specific key
@@ -77,7 +77,7 @@ def example_astronauts():
             name = person_in_space["name"]
             print(f"{name} is currently in space flying on the {craft}! {greeting}")
 
-    get_astronauts()
+    print_astronauts()
 
 
 # Instantiate the DAG
