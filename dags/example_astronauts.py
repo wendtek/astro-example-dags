@@ -48,8 +48,32 @@ def example_astronauts():
         of Astronauts to be used in the next task.
         """
         r = requests.get("http://api.open-notify.org/astros.json")
-        number_of_people_in_space = r.json()["number"]
-        list_of_people_in_space = r.json()["people"]
+        
+        # Debug information about the response
+        print(f"Response status code: {r.status_code}")
+        print(f"Response headers: {dict(r.headers)}")
+        print(f"Response content type: {r.headers.get('content-type', 'Not specified')}")
+        print(f"Response content length: {len(r.content)} bytes")
+        print(f"Response encoding: {r.encoding}")
+        print(f"Response text (first 500 chars): {r.text[:500]}")
+        
+        # Check if request was successful
+        if r.status_code != 200:
+            print(f"ERROR: Request failed with status code {r.status_code}")
+            print(f"Response text: {r.text}")
+            raise Exception(f"API request failed with status {r.status_code}")
+        
+        # Parse JSON once and store it
+        try:
+            response_data = r.json()
+            print(f"Successfully parsed JSON. Keys in response: {list(response_data.keys())}")
+        except Exception as e:
+            print(f"ERROR: Failed to parse JSON - {e}")
+            print(f"Raw response content: {r.content}")
+            raise
+            
+        number_of_people_in_space = response_data["number"]
+        list_of_people_in_space = response_data["people"]
 
         context["ti"].xcom_push(
             key="number_of_people_in_space", value=number_of_people_in_space
