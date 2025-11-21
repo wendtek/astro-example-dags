@@ -39,7 +39,7 @@ def example_astronauts():
         # Define an asset outlet for the task. This can be used to schedule downstream DAGs when this task has run.
         outlets=[Asset("current_astronauts")]
     )  # Define that this task updates the `current_astronauts` Asset
-    def get_astronauts(**context) -> list[dict]:
+    def get_astronauts(**context) -> None:
         """
         This task uses the requests library to retrieve a list of Astronauts
         currently in space. The results are pushed to XCom with a specific key
@@ -69,26 +69,15 @@ def example_astronauts():
                 {"craft": "Tiangong", "name": "Ye Guangfu"},
             ]
 
-        return list_of_people_in_space
+        print(f"Total people in space: {number_of_people_in_space}")
+    
+        greeting = "Hello! :)"
+        for person_in_space in list_of_people_in_space:
+            craft = person_in_space["craft"]
+            name = person_in_space["name"]
+            print(f"{name} is currently in space flying on the {craft}! {greeting}")
 
-    @task
-    def print_astronaut_craft(greeting: str, person_in_space: dict) -> None:
-        """
-        This task creates a print statement with the name of an
-        Astronaut in space and the craft they are flying on from
-        the API request results of the previous task, along with a
-        greeting which is hard-coded in this example.
-        """
-        craft = person_in_space["craft"]
-        name = person_in_space["name"]
-
-        print(f"{name} is currently in space flying on the {craft}! {greeting}")
-
-    # Use dynamic task mapping to run the print_astronaut_craft task for each
-    # Astronaut in space
-    print_astronaut_craft.partial(greeting="Hello! :)").expand(
-        person_in_space=get_astronauts()  # Define dependencies using TaskFlow API syntax
-    )
+    get_astronauts()
 
 
 # Instantiate the DAG
